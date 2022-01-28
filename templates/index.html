@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="/static/index.js"></script>
+    <title>CSV Data tool</title>
+  </head>
+  <body>
+    <div class="container">
+      <h1>CSV Data Tool</h1>
+      <br>
+      <form action="{{ url_for('handle_data') }}" method="post" enctype="multipart/form-data">
+        <input type="file" name="file">
+        <input type="submit">
+      </form>
+    </div>
+  </body>
+</html>
