@@ -56,10 +56,12 @@ def handle_data():
             file.save(filepath)
 
             data = pd.read_csv(filepath)
-            data.to_string(buf=buf)
-            s = buf.getvalue()
 
-            return data.to_string()
+            columns = data.columns
+
+
+
+            return ""
 
         return "file uploaded"
 
