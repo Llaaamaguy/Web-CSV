@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 flask = "*"
 pandas = "*"
+pysqlite3 = "*"
+ipython = "*"
 
 [dev-packages]
 

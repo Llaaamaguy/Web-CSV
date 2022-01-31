@@ -2,11 +2,14 @@
 <html lang="en">
   <head>
     <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Josefin+Sans" />
     <title>CSV Data tool</title>
   </head>
   <body>
     <div class="container">
       <h1>CSV Data Tool</h1>
+      <hr>
+      <h3>By Devin Kennedy</h3>
       <br>
       <form action="{{ url_for('handle_data') }}" method="post" enctype="multipart/form-data">
         <input type="file" name="file">
