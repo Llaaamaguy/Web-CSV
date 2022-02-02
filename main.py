@@ -1,11 +1,9 @@
-from flask import Flask, render_template, request, flash, redirect, url_for, jsonify
+from flask import Flask, render_template, request, redirect, jsonify, url_for
 from werkzeug.utils import secure_filename
 import os
 from os.path import exists
 import random
 import pandas as pd
-import io
-from IPython.display import HTML
 import time
 import threading
 
@@ -15,8 +13,7 @@ UPLOAD_FOLDER = "/Users/dkennedy/PycharmProjects/datatool/user_files"
 ALLOWED_EXTENSIONS = ["csv"]
 
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
-
-buf = io.StringIO()
+app.config["SECRET_KEY"] = "x827GAO901Jjxj@82jceh@1"
 
 
 def allowed_file(filename):
@@ -24,10 +21,19 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-def del_file(htmlfile, datafile):
+def delete_file(html_file, data_file):
     time.sleep(60)
-    os.remove(htmlfile)
-    os.remove(datafile)
+    os.remove(html_file)
+    os.remove(data_file)
+
+
+def add_file_securely(file):
+    while exists(file):
+        file_name_extension = file.split(".")
+        file_name = file_name_extension[0]
+        ext = file_name_extension[1]
+        file = file_name + str(random.randint(1, 10)) + "." + str(ext)
+    return file
 
 
 @app.route("/")
@@ -39,10 +45,9 @@ def index():
 def handle_data():
     if request.method == "POST":
 
+        # If the user does not upload a file
         if 'file' not in request.files:
-            print("No file")
-
-            return redirect(request.url)
+            return jsonify({"error": "please iu"})
 
         file = request.files["file"]
 
@@ -51,50 +56,86 @@ def handle_data():
 
             return redirect(request.url)
 
+        if not allowed_file(file.filename):
+            return jsonify({"message": "You must use a .csv file"})
+
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
             datafile = filepath
 
             while exists(filepath):
-                fnameext = filename.split(".")
-                fname = fnameext[0]
-                ext = fnameext[1]
-                filename = fname + str(random.randint(1, 10)) + "." + str(ext)
+                file_name_extension = filename.split(".")
+                file_name = file_name_extension[0]
+                ext = file_name_extension[1]
+                filename = file_name + str(random.randint(1, 10)) + "." + str(ext)
                 filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
                 datafile = filepath
 
             file.save(filepath)
             data = pd.read_csv(filepath)
 
-            htmldata = data.to_html(classes="table table-striped")
-            fname = "templates/viewData" + str(random.randint(1,9999999)) + ".html"
-            while exists(fname):
-                fname = fname.split(".")
-                file = fname[0]
-                ext = fname[1]
-                fname = file + str(random.randint(1,10)) + "." + str(ext)
+            html_data = data.to_html(classes="table table-striped")
+            file_name = "templates/viewData" + str(random.randint(1, 9999999)) + ".html"
+            while exists(file_name):
+                file_name = file_name.split(".")
+                file = file_name[0]
+                ext = file_name[1]
+                file_name = file + str(random.randint(1, 10)) + "." + str(ext)
 
-            with open(fname, "w") as f:
-                f.write(htmldata)
+            with open(file_name, "w") as f:
+                f.write('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">')
 
-            t = threading.Thread(target=del_file, args=(fname, datafile)).start()
+            with open(file_name, "a") as f:
+                f.write('<h1>Data View</h1>')
+                f.write('<hr>')
+                f.write(html_data)
 
-            fname = fname.split("/")
-            fname = fname[1]
+            threading.Thread(target=delete_file, args=(file_name, datafile)).start()
 
-            return render_template(fname)
+            file_name = file_name.split("/")[1]
 
-        return jsonify({"message": "file opened :thunbs2up:!"})
+            return render_template(file_name)
+
+        return jsonify({"message": "file opened :thumbs_up:!"})
 
     if request.method == "GET":
-        return jsonify({"message": "This was made by a get method?"})
+        return jsonify({"message": "Select a file"})
+
+
+@app.route("/analyze_data", methods=["POST", "GET"])
+def analyze_data():
+    if request.method == "GET":
+        return jsonify({"message": "Feature coming soon"})
+    if request.method == "POST":
+        if 'file' not in request.files:
+            return jsonify({"error": "Please select a file"})
+
+        file = request.files["file"]
+
+        if file.filename == "":
+            return jsonify({"error": "Please select a file"})
+
+        if not allowed_file(file):
+            return jsonify({"error"})
+
+        return jsonify({"message": "Feature coming soon"})
+
+
+@app.route("/login", methods=["POST", "GET"])
+def login():
+    if request.method == "POST":
+        data = request.json
+        print(data)
+        return "Success"
+
+
+@app.route("/quick_access")
+def quick_access():
+    return render_template("quick_access.html")
 
 
 if __name__ == "__main__":
-    app.secret_key = "x827GAO901Jjxj@82jceh@1"
-
     app.debug = True
 
-    app.run("127.0.0.1", 5000)
-
+    app.run("0.0.0.0")

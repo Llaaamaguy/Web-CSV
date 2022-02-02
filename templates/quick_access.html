@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<!--suppress ALL-->
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Josefin+Sans" />
+    <link rel="icon" href="https://jennipher.tech/assets/j.png" type="image/png">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <meta name="google-signin-client_id" content="592625169683-8orjkfnnnp3ceslq9d5oc2bvq8b4nsdg.apps.googleusercontent.com">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <meta charset="UTF-8">
+    <title>Quick Access Files</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Quick Access your files</h1>
+        <h3 id="username"></h3>
+        <p id="useremail"></p>
+        <script src="/static/googleInit.js"></script>
+        <a href="#" onclick="signOut();">Sign out</a>
+        <script>
+            function signOut() {
+                var auth2 = gapi.auth2.getAuthInstance();
+                auth2.signOut();
+                window.location.replace("http://localhost:5000/")
+            }
+        </script>
+    </div>
+</body>
+</html>

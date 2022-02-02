@@ -1,20 +1,65 @@
 <!DOCTYPE html>
+<!--suppress ALL -->
 <html lang="en">
   <head>
     <link rel="stylesheet" href="/static/style.css">
     <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Josefin+Sans" />
+    <link rel="icon" href="https://jennipher.tech/assets/j.png" type="image/png">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <meta name="google-signin-client_id" content="592625169683-8orjkfnnnp3ceslq9d5oc2bvq8b4nsdg.apps.googleusercontent.com">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <meta charset="UTF-8">
     <title>CSV Data tool</title>
   </head>
   <body>
     <div class="container">
-      <h1>CSV Data Tool</h1>
-      <hr>
-      <h3>By Devin Kennedy</h3>
+      <h1 class="header" id="cool">CSV Data Tool</h1>
+      <p class="subtitle">A Jennipher Project</p>
+      <p class="subtitle">"By" Devin Kennedy</p>
+      <div class="g-signin2" data-onsuccess="onSuccess"></div>
+      <script>
+        var url = "/login";
+        function onSuccess(googleUser) {
+          var profile = googleUser.getBasicProfile();
+          var Http = new XMLHttpRequest();
+          Http.open("POST", url, true);
+          Http.setRequestHeader("Content-Type", "application/json");
+          Http.send(JSON.stringify({
+            "userName": profile.getName(),
+            "userEmail": profile.getEmail(),
+            "userImage": profile.getImageUrl()
+          }));
+          window.location.replace("http://localhost:5000/quick_access")
+
+        }
+      </script>
       <br>
+      <h2>View a file:</h2>
       <form action="{{ url_for('handle_data') }}" method="post" enctype="multipart/form-data">
         <input type="file" name="file">
         <input type="submit">
       </form>
+      <br>
+      <hr id="separator">
+      <br>
+      <h2>Analyze a file:</h2>
+      <form action="{{ url_for('analyze_data') }}" method="post" enctype="multipart/form-data">
+        <input type="file" name="file">
+        <input type="submit">
+      </form>
+      <br>
+      <a href="#" onclick="signOut();">Sign out</a>
+      <script>
+        function signOut() {
+          var auth2 = gapi.auth2.getAuthInstance();
+          auth2.signOut().then(function() {
+            console.log("User signed out");
+          });
+        }
+      </script>
+      <br>
+      <br>
+      <footer>This website is cuurently <i>in development</i>.</footer>
     </div>
   </body>
 </html>

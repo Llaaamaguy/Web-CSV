@@ -1,9 +1,25 @@
-.container {
-  text-align: center;
-  font-family: "Josefin Sans", serif;
+body {
+  margin: 0;
 }
 
-hr {
-  width: 45%;
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  flex-direction: column;
+  width: 100%;
+  font-family: 'Josefin Sans', sans-serif;
+}
 
+.header {
+  margin: 1em 0 0;
+}
+
+.subtitle {
+  margin: 0 0 0.2em;
+}
+
+.g-signin2 {
+  margin: 1em;
 }
