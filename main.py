@@ -6,6 +6,8 @@ import random
 import pandas as pd
 import time
 import threading
+from google.oauth2 import id_token
+from google.auth.transport import requests
 
 app = Flask(__name__)
 
@@ -122,20 +124,24 @@ def analyze_data():
         return jsonify({"message": "Feature coming soon"})
 
 
-@app.route("/login", methods=["POST", "GET"])
-def login():
-    if request.method == "POST":
-        data = request.json
-        print(data)
-        return "Success"
+@app.route("/verify", methods=["POST", "GET"])
+def verify():
+    data = request.values
+    idtoken = data["idtoken"]
+    try:
+        idinfo = id_token.verify_oauth2_token(idtoken, requests.Request(), os.environ["GOOGLE_CLIENTID"])
+        userid = idinfo['sub']
+        return idtoken
+    except ValueError:
+        return jsonify({"Error": "Invalid id token"})
 
 
-@app.route("/quick_access")
-def quick_access():
-    return render_template("quick_access.html")
+@app.route("/quick_access/<idtoken>", methods=["POST", "GET"])
+def quick_access(idtoken):
+    return render_template("quick_access.html", id_token=idtoken)
 
 
 if __name__ == "__main__":
     app.debug = True
 
-    app.run("0.0.0.0")
+    app.run("127.0.0.1", 5000)

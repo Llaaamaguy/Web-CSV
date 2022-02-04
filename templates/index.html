@@ -12,25 +12,29 @@
     <title>CSV Data tool</title>
   </head>
   <body>
+    <script>
+      document.getElementById("quickAccess").disabled = true;
+    </script>
     <div class="container">
       <h1 class="header" id="cool">CSV Data Tool</h1>
       <p class="subtitle">A Jennipher Project</p>
       <p class="subtitle">"By" Devin Kennedy</p>
       <div class="g-signin2" data-onsuccess="onSuccess"></div>
       <script>
-        var url = "/login";
+        var url = "/verify";
         function onSuccess(googleUser) {
           var profile = googleUser.getBasicProfile();
+          var id_token = googleUser.getAuthResponse().id_token;
           var Http = new XMLHttpRequest();
           Http.open("POST", url, true);
-          Http.setRequestHeader("Content-Type", "application/json");
-          Http.send(JSON.stringify({
-            "userName": profile.getName(),
-            "userEmail": profile.getEmail(),
-            "userImage": profile.getImageUrl()
-          }));
-          window.location.replace("http://localhost:5000/quick_access")
-
+          Http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+          Http.send('idtoken=' + id_token);
+          Http.onload = function() {
+            window.location.href = "/quick_access/" + Http.responseText;
+          };
+          Http.onerror = function() {
+            console.log("error");
+          };
         }
       </script>
       <br>

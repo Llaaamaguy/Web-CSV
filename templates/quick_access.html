@@ -16,14 +16,20 @@
         <h1>Quick Access your files</h1>
         <h3 id="username"></h3>
         <p id="useremail"></p>
-        <script src="/static/googleInit.js"></script>
-        <a href="#" onclick="signOut();">Sign out</a>
+        <img id="userimage">
         <script>
-            function signOut() {
-                var auth2 = gapi.auth2.getAuthInstance();
-                auth2.signOut();
-                window.location.replace("http://localhost:5000/")
+            function reqListener() {
+                var data = JSON.parse(this.responseText);
+                document.getElementById("username").innerHTML = data["name"];
+                document.getElementById("useremail").innerHTML = data["email"];
+                document.getElementById("userimage").src = data["picture"];
             }
+            var id_token = "{{ id_token }}";
+            var url = "https://oauth2.googleapis.com/tokeninfo?id_token=" + id_token;
+            var Http = new XMLHttpRequest();
+            Http.addEventListener('load', reqListener);
+            Http.open("GET", url, true);
+            Http.send();
         </script>
     </div>
 </body>

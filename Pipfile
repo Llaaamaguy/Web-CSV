@@ -8,6 +8,8 @@ flask = "*"
 pandas = "*"
 pysqlite3 = "*"
 ipython = "*"
+google-auth = "*"
+requests = "*"
 
 [dev-packages]
 
