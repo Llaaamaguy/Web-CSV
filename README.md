@@ -5,6 +5,7 @@
 #TODO:
 * Implement cases for invalid tokens
 * Implement formatted error screens
-* Format quick access screen
-* Find a viable cloud storage solution
+* Continue formatting the quick access screen
+* Set up the hosted Mongo DB
 * Implement quick access
+* Hide the URL token

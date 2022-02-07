@@ -2,7 +2,7 @@
 <!--suppress ALL-->
 <html lang="en">
 <head>
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/QAStyle.css">
     <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Josefin+Sans" />
     <link rel="icon" href="https://jennipher.tech/assets/j.png" type="image/png">
     <script src="https://apis.google.com/js/platform.js" async defer></script>
@@ -14,9 +14,11 @@
 <body>
     <div class="container">
         <h1>Quick Access your files</h1>
-        <h3 id="username"></h3>
-        <p id="useremail"></p>
-        <img id="userimage">
+        <div class="item">
+            <h3 id="username"></h3>
+            <p id="useremail"></p>
+            <img id="userimage">
+        </div>
         <script>
             function reqListener() {
                 var data = JSON.parse(this.responseText);

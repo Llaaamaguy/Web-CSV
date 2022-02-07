@@ -1,0 +1,37 @@
+body {
+  margin: 0;
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  flex-direction: column;
+  width: 100%;
+  font-family: 'Josefin Sans', sans-serif;
+}
+
+.subtitle {
+  margin: 0 0 0.2em;
+}
+
+div.item {
+    vertical-align: top;
+    display: inline-block;
+    text-align: center;
+    width: 120px;
+}
+
+#userimage {
+    border-radius: 50%;
+    position: absolute;
+    top: 5%;
+    right: 10%;
+    z-index: 905;
+}
+
+#username {
+    display: block;
+}
+
