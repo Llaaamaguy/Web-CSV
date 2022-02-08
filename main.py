@@ -9,8 +9,10 @@ import threading
 from google.oauth2 import id_token
 from google.auth.transport import requests
 
+# Init the Flask app
 app = Flask(__name__)
 
+# Determine the upload folder and allowed extensions
 UPLOAD_FOLDER = "/Users/dkennedy/PycharmProjects/datatool/user_files"
 ALLOWED_EXTENSIONS = ["csv"]
 
@@ -18,17 +20,20 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 app.config["SECRET_KEY"] = "x827GAO901Jjxj@82jceh@1"
 
 
+# A check for if the file should be allowed
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
+# Safely delete the files
 def delete_file(html_file, data_file):
     time.sleep(60)
     os.remove(html_file)
     os.remove(data_file)
 
 
+# Determine a unique file name
 def add_file_securely(file):
     while exists(file):
         file_name_extension = file.split(".")
@@ -53,9 +58,11 @@ def handle_data():
 
         file = request.files["file"]
 
+        # Redundancy for if the user doesnt upload a file
         if file.filename == "":
             return render_template("general_error.html", desc="Please select a file")
 
+        # Check if the file is allowed
         if not allowed_file(file.filename):
             return render_template("general_error.html", desc="You must use a .csv (comma separated values) file")
 
@@ -64,6 +71,7 @@ def handle_data():
             filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
             datafile = filepath
 
+            # More ensuring that the file name is unique, as to not overwrite any other file
             while exists(filepath):
                 file_name_extension = filename.split(".")
                 file_name = file_name_extension[0]
@@ -75,6 +83,7 @@ def handle_data():
             file.save(filepath)
             data = pd.read_csv(filepath)
 
+            # Generate the HTML file for the user to view their data
             html_data = data.to_html(classes="table table-striped")
             file_name = "templates/viewData" + str(random.randint(1, 9999999)) + ".html"
             while exists(file_name):
@@ -97,12 +106,14 @@ def handle_data():
 
             return render_template(file_name)
 
+        # The user will never see this
         return jsonify({"message": "file opened :thumbs_up:!"})
 
     if request.method == "GET":
         return render_template("general_error.html", desc="Please select a file")
 
 
+# Data analyzation endpoint -- in development
 @app.route("/analyze_data", methods=["POST", "GET"])
 def analyze_data():
     if request.method == "GET":
@@ -122,6 +133,7 @@ def analyze_data():
         return render_template("general_error.html", desc="Feature coming soon")
 
 
+# Verify the integrity of the given ID Token - This should always be True but there are rare cases where it is False
 @app.route("/verify", methods=["POST", "GET"])
 def verify():
     data = request.values
@@ -134,6 +146,7 @@ def verify():
         return render_template("general_error.html", desc="Bad ID Token")
 
 
+# Quick Access feature endpoint
 @app.route("/quick_access/<idtoken>", methods=["POST", "GET"])
 def quick_access(idtoken):
     return render_template("quick_access.html", id_token=idtoken)
