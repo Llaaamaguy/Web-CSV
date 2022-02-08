@@ -49,17 +49,15 @@ def handle_data():
 
         # If the user does not upload a file
         if 'file' not in request.files:
-            return jsonify({"error": "please iu"})
+            return render_template("general_error.html", desc="Please select a file")
 
         file = request.files["file"]
 
         if file.filename == "":
-            print("No selected file")
-
-            return redirect(request.url)
+            return render_template("general_error.html", desc="Please select a file")
 
         if not allowed_file(file.filename):
-            return jsonify({"message": "You must use a .csv file"})
+            return render_template("general_error.html", desc="You must use a .csv (comma separated values) file")
 
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
@@ -102,7 +100,7 @@ def handle_data():
         return jsonify({"message": "file opened :thumbs_up:!"})
 
     if request.method == "GET":
-        return jsonify({"message": "Select a file"})
+        return render_template("general_error.html", desc="Please select a file")
 
 
 @app.route("/analyze_data", methods=["POST", "GET"])
