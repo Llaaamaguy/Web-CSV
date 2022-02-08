@@ -109,17 +109,17 @@ def analyze_data():
         return jsonify({"message": "Feature coming soon"})
     if request.method == "POST":
         if 'file' not in request.files:
-            return jsonify({"error": "Please select a file"})
+            return render_template("general_error.html", desc="Please select a file")
 
         file = request.files["file"]
 
         if file.filename == "":
-            return jsonify({"error": "Please select a file"})
+            return render_template("general_error.html", desc="Please select a file")
 
-        if not allowed_file(file):
-            return jsonify({"error"})
+        if not allowed_file(file.filename):
+            return render_template("general_error.html", desc="You must use a .csv (comma separated values) file")
 
-        return jsonify({"message": "Feature coming soon"})
+        return render_template("general_error.html", desc="Feature coming soon")
 
 
 @app.route("/verify", methods=["POST", "GET"])
@@ -131,7 +131,7 @@ def verify():
         userid = idinfo['sub']
         return idtoken
     except ValueError:
-        return jsonify({"Error": "Invalid id token"})
+        return render_template("general_error.html", desc="Bad ID Token")
 
 
 @app.route("/quick_access/<idtoken>", methods=["POST", "GET"])
