@@ -5,7 +5,9 @@
 # TODO:
 * Implement cases for invalid tokens
 * Implement formatted error screens
+* Implement the Analyze Data feature(s)
 * Continue formatting the quick access screen
+* Set up NodeJS implementation
 * Set up the hosted Mongo DB
 * Implement quick access
 * Hide the URL token
