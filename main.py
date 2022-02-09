@@ -27,20 +27,40 @@ def allowed_file(filename):
 
 
 # Safely delete the files
-def delete_file(html_file, data_file):
+def delete_files(files):
     time.sleep(60)
-    os.remove(html_file)
-    os.remove(data_file)
+    for i in files:
+        os.remove(i)
 
 
 # Determine a unique file name
 def add_file_securely(file):
-    while exists(file):
-        file_name_extension = file.split(".")
+    filename = secure_filename(file.filename)
+    filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+
+    while exists(filepath):
+        file_name_extension = filename.split(".")
         file_name = file_name_extension[0]
         ext = file_name_extension[1]
-        file = file_name + str(random.randint(1, 10)) + "." + str(ext)
-    return file
+        filename = file_name + str(random.randint(1, 10)) + "." + str(ext)
+        filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+
+    file.save(filepath)
+    return filepath
+
+
+def add_html_securely(file_name, water=True):
+    while exists(file_name):
+        file_name = file_name.split(".")
+        file = file_name[0]
+        ext = file_name[1]
+        file_name = file + str(random.randint(1, 10)) + "." + str(ext)
+
+    if water:
+        with open(file_name, "w") as f:
+            f.write('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">')
+
+    return file_name
 
 
 @app.route("/")
@@ -67,40 +87,21 @@ def handle_data():
             return render_template("general_error.html", desc="You must use a .csv (comma separated values) file")
 
         if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+            filepath = add_file_securely(file)
             datafile = filepath
-
-            # More ensuring that the file name is unique, as to not overwrite any other file
-            while exists(filepath):
-                file_name_extension = filename.split(".")
-                file_name = file_name_extension[0]
-                ext = file_name_extension[1]
-                filename = file_name + str(random.randint(1, 10)) + "." + str(ext)
-                filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
-                datafile = filepath
-
-            file.save(filepath)
             data = pd.read_csv(filepath)
 
             # Generate the HTML file for the user to view their data
             html_data = data.to_html(classes="table table-striped")
             file_name = "templates/viewData" + str(random.randint(1, 9999999)) + ".html"
-            while exists(file_name):
-                file_name = file_name.split(".")
-                file = file_name[0]
-                ext = file_name[1]
-                file_name = file + str(random.randint(1, 10)) + "." + str(ext)
-
-            with open(file_name, "w") as f:
-                f.write('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">')
+            file_name = add_html_securely(file_name)
 
             with open(file_name, "a") as f:
                 f.write('<h1>Data View</h1>')
                 f.write('<hr>')
                 f.write(html_data)
 
-            threading.Thread(target=delete_file, args=(file_name, datafile)).start()
+            threading.Thread(target=delete_files, args=([file_name, datafile])).start()
 
             file_name = file_name.split("/")[1]
 
@@ -129,6 +130,9 @@ def analyze_data():
 
         if not allowed_file(file.filename):
             return render_template("general_error.html", desc="You must use a .csv (comma separated values) file")
+
+        filepath = add_file_securely(file)
+        data = pd.read_csv(filepath)
 
         return render_template("general_error.html", desc="Feature coming soon")
 
