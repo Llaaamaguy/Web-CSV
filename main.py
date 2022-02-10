@@ -8,6 +8,7 @@ import time
 import threading
 from google.oauth2 import id_token
 from google.auth.transport import requests
+import io
 
 # Init the Flask app
 app = Flask(__name__)
@@ -18,6 +19,8 @@ ALLOWED_EXTENSIONS = ["csv"]
 
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 app.config["SECRET_KEY"] = "x827GAO901Jjxj@82jceh@1"
+
+buffer = io.StringIO()
 
 
 # A check for if the file should be allowed
@@ -101,7 +104,8 @@ def handle_data():
                 f.write('<hr>')
                 f.write(html_data)
 
-            threading.Thread(target=delete_files, args=([file_name, datafile])).start()
+            delfiles = [file_name, datafile]
+            threading.Thread(target=delete_files, args=(delfiles,)).start()
 
             file_name = file_name.split("/")[1]
 
@@ -134,7 +138,17 @@ def analyze_data():
         filepath = add_file_securely(file)
         data = pd.read_csv(filepath)
 
-        return render_template("general_error.html", desc="Feature coming soon")
+        data.info(buf=buffer)
+        info = buffer.getvalue().split("\n")
+
+        infohtml = ""
+        for lines in info:
+            infohtml = infohtml + "<pre>" + lines + "</pre> <br>\n"
+
+        delfiles = [filepath]
+        threading.Thread(target=delete_files, args=(delfiles,)).start()
+
+        return render_template("analyze_data.html", info=infohtml)
 
 
 # Verify the integrity of the given ID Token - This should always be True but there are rare cases where it is False
