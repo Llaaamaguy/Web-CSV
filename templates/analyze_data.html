@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!--suppress ALL-->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -8,13 +9,46 @@
     <title>Analyze Data</title>
 </head>
 <body>
+    <script>
+        var data = {{ jsondata | tojson }};
+        let data_location = data["location"];
+        document.getElementById("yay").innerHTML = JSON.stringify(location);
+    </script>
+    <script>
+        function renderGraph() {
+            console.log("Called");
+            const col1 = document.getElementById("col1").value;    //8===D
+            const col2 = document.getElementById("col2").value;
+            console.log(col2);
+            const vals1 = data[col1];
+            const vals2 = data[col2];
+            console.log(vals2);
+            var url = "/render_graph";
+            var Http = new XMLHttpRequest();
+            Http.open("POST", url, true);
+            Http.setRequestHeader("Content-Type", "application/json");
+            let text = '{ "data" : [' +
+                '{' + col1 + ': ' + vals1 + '},' +
+                '{' + col2 + ': ' + vals2 + '} ]}';
+            const toSend = JSON.parse(text)
+            Http.send(toSend);
+        }
+    </script>
     <div class="container">
-        <h1>Data info:</h1>
+        <h1 id="yay">Data info:</h1>
         <div class="info">
             {{ info | safe }}
         </div>
+        <div class="cols">
+            {{ cols | safe }}
+        </div>
         <br>
         <h1>Graph:</h1>
+        <form name="renderGraph" action="JavaScript:renderGraph();">
+            <input type="text" placeholder="Name of column 1" id="col1">
+            <input type="text" placeholder="Name of column 2" id="col2">
+            <input type="submit" name="Render">
+        </form>
         <footer>
             <a href="/">Go Back</a>
         </footer>

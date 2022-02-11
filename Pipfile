@@ -10,6 +10,7 @@ pysqlite3 = "*"
 ipython = "*"
 google-auth = "*"
 requests = "*"
+tabulate = "*"
 
 [dev-packages]
 

@@ -10,4 +10,4 @@ A Jennipher project -- by Devin Kennedy
 * Set up NodeJS implementation
 * Set up the hosted Mongo DB
 * Fully implement quick access
-* Hide the URL token
+* Set the ID token into the Cookies

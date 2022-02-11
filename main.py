@@ -9,6 +9,8 @@ import threading
 from google.oauth2 import id_token
 from google.auth.transport import requests
 import io
+from tabulate import tabulate
+import json
 
 # Init the Flask app
 app = Flask(__name__)
@@ -138,6 +140,9 @@ def analyze_data():
         filepath = add_file_securely(file)
         data = pd.read_csv(filepath)
 
+        jsondata = data.to_json()
+        parsed = json.loads(jsondata)
+
         data.info(buf=buffer)
         info = buffer.getvalue().split("\n")
 
@@ -145,10 +150,12 @@ def analyze_data():
         for lines in info:
             infohtml = infohtml + "<pre>" + lines + "</pre> <br>\n"
 
+        colhtml = tabulate([data.columns], tablefmt='html')
+
         delfiles = [filepath]
         threading.Thread(target=delete_files, args=(delfiles,)).start()
 
-        return render_template("analyze_data.html", info=infohtml)
+        return render_template("analyze_data.html", info=infohtml, jsondata=parsed, cols=colhtml)
 
 
 # Verify the integrity of the given ID Token - This should always be True but there are rare cases where it is False
@@ -168,6 +175,17 @@ def verify():
 @app.route("/quick_access/<idtoken>", methods=["POST", "GET"])
 def quick_access(idtoken):
     return render_template("quick_access.html", id_token=idtoken)
+
+
+@app.route("/render_graph", methods=["POST", "GET"])
+def render_graph():
+    if request.method == "POST":
+        data = request.json
+        print(data)
+        return "OK: POST"
+    if request.method == "GET":
+        print("Get")
+        return "BAD"
 
 
 if __name__ == "__main__":
